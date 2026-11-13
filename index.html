@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Soham, Electronics and Telecommunication student building low-power wireless systems.">
+<title>Soham's Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+  /* Layout: warm paper with a drifting field of radio-wave traces behind one monospace column, a thin top nav,
+     labelled sections with a trailing rule. A dot sending out ripples sits beside the tagline. Terracotta accent. */
+  :root {
+    --bg: #f8f3ec;
+    --wave: #c9967f;
+    --fg: #231d19;
+    --muted: #7a6f66;
+    --line: #d9cfc4;
+    --accent: #b04a24;
+    --slot: #efe6db;
+    --font: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171310; --wave: #a8664a; --fg: #efe7dd; --muted: #9a8f84;
+      --line: #342c26; --accent: #e8794d; --slot: #211b17;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171310; --wave: #a8664a; --fg: #efe7dd; --muted: #9a8f84;
+    --line: #342c26; --accent: #e8794d; --slot: #211b17;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.8;
+    margin: 0;
+    min-height: 100vh;
+    padding-block: 40px 80px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  #waves { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: block; }
+  main { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
+  a { color: inherit; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  a:hover { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+  /* nav */
+  nav { display: flex; justify-content: flex-end; gap: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  nav a { color: var(--muted); text-decoration: none; padding-bottom: 4px; border-bottom: 2px solid transparent; }
+  nav a:hover, nav a[aria-current] { color: var(--fg); }
+  nav a[aria-current] { border-bottom-color: var(--accent); }
+
+  /* header */
+  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-block: 64px 48px; }
+  h1 { font-weight: 400; font-size: clamp(34px, 8vw, 46px); line-height: 1.1; margin: 0; letter-spacing: -0.01em; }
+
+  /* sections */
+  .label { display: flex; align-items: center; gap: 16px; margin: 0 0 24px; font-style: italic; color: var(--muted); font-weight: 400; font-size: 15px; }
+  .label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  section { margin-bottom: 56px; }
+  p { margin: 0 0 20px; }
+  .project h3 { font-weight: 500; font-size: 17px; margin: 0 0 4px; }
+  .project p { color: var(--muted); margin: 0 0 12px; }
+  .project a { color: var(--accent); }
+
+  .links { display: flex; flex-wrap: wrap; gap: 8px 32px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .links a { text-decoration: none; }
+  .links a:hover { text-decoration: underline; }
+
+  @media (max-width: 520px) {
+    header { padding-block: 40px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="waves" aria-hidden="true"></canvas>
+
+<main>
+  <nav aria-label="Sections">
+    <a href="#about" aria-current="page">about</a>
+    <a href="#project">project</a>
+  </nav>
+
+  <header>
+    <h1>Soham</h1>
+  </header>
+
+  <section id="about">
+    <h2 class="label">About</h2>
+    <p>Hello! I'm Soham, a second-year Electronics &amp; Telecommunication student at VJTI. I love building things, and sharing data without any wires never stops exciting me.</p>
+    <p>Away from the bench, I'm out on a cycling ride or listening to music.</p>
+  </section>
+
+  <section id="project">
+    <h2 class="label">Project</h2>
+    <div class="project">
+      <h3>Aura</h3>
+      <p>A system for sending data wirelessly at very low power using backscattering. Instead of generating its own carrier, it reflects existing signals to carry the data.</p>
+      <a href="https://github.com/moonknightnotfound/Aura" target="_blank" rel="noopener">view on github</a>
+    </div>
+  </section>
+
+  <div class="links">
+    <a href="https://github.com/moonknightnotfound" target="_blank" rel="noopener">github</a>
+    <a href="https://www.linkedin.com/in/soham-vhatkar-030774432/" target="_blank" rel="noopener">linkedin</a>
+  </div>
+</main>
+
+<script>
+  /* Radio-wave field: amplitude-modulated, slightly chirped traces that drift slowly. */
+  (function () {
+    var canvas = document.getElementById('waves');
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var W = 0, H = 0, colors = { wave: '#c9967f', accent: '#b04a24' };
+    var LINES = 22, STEP = 6, raf = 0, start = performance.now();
+
+    var seeds = [];
+    for (var i = 0; i < LINES; i++) {
+      seeds.push({
+        phase: i * 1.37 + Math.sin(i * 2.1) * 2,
+        k1: 0.0042 + (i % 5) * 0.0007,
+        k2: 0.0091 + (i % 3) * 0.0011,
+        chirp: 0.0000016 * (1 + (i % 4) * 0.35),
+        amp: 20 + (i % 6) * 7,
+        drift: 0.22 + (i % 4) * 0.07,
+        env: 0.0009 + (i % 3) * 0.0004
+      });
+    }
+
+    function readColors() {
+      var s = getComputedStyle(document.documentElement);
+      colors.wave = s.getPropertyValue('--wave').trim() || colors.wave;
+      colors.accent = s.getPropertyValue('--accent').trim() || colors.accent;
+    }
+
+    function resize() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw((performance.now() - start) / 1000);
+    }
+
+    function draw(t) {
+      ctx.clearRect(0, 0, W, H);
+      ctx.lineJoin = 'round';
+      for (var i = 0; i < LINES; i++) {
+        var s = seeds[i];
+        var base = H * (0.04 + 0.92 * i / (LINES - 1));
+        var accent = i % 6 === 2;
+        ctx.beginPath();
+        for (var x = -10; x <= W + STEP; x += STEP) {
+          var chirped = x * s.k1 + s.chirp * x * x;
+          var env = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(x * s.env + s.phase + t * 0.12));
+          var y = base + s.amp * env * (
+            0.62 * Math.sin(chirped + t * s.drift + s.phase) +
+            0.38 * Math.sin(x * s.k2 - t * s.drift * 0.7 + s.phase * 1.7)
+          );
+          if (x === -10) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = accent ? colors.accent : colors.wave;
+        ctx.globalAlpha = accent ? 0.34 : 0.26;
+        ctx.lineWidth = accent ? 1.4 : 1.1;
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function frame(now) {
+      draw((now - start) / 1000);
+      raf = requestAnimationFrame(frame);
+    }
+    function run() {
+      cancelAnimationFrame(raf);
+      if (reduce.matches || document.hidden) { draw((performance.now() - start) / 1000); return; }
+      raf = requestAnimationFrame(frame);
+    }
+
+    readColors();
+    resize();
+    run();
+    window.addEventListener('resize', resize);
+    document.addEventListener('visibilitychange', run);
+    try { reduce.addEventListener('change', run); } catch (e) {}
+    try {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { readColors(); run(); });
+    } catch (e) {}
+    new MutationObserver(function () { readColors(); run(); })
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  })();
+</script>
+</body>
+</html>
